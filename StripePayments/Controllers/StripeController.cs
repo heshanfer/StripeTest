@@ -49,7 +49,6 @@ namespace StripeTest.Controllers
                 var responseString = UnicodeEncoding.UTF8.GetString(request_data);
                 data = responseString;
 
-                // TODO 
                 // user id -> db
 
             }
@@ -80,7 +79,6 @@ namespace StripeTest.Controllers
             var email = Request["stripeEmail"];
             StripeCustomer customer = CreateStripeCustomer(email,token);
             
-            // TODO
             // customer.Id -> db
 
             ViewData["token"] = token;
@@ -109,75 +107,138 @@ namespace StripeTest.Controllers
         /// <summary>
         ///  Charge money from customer
         /// </summary>
+        /// 
+
+
+
 
         public ActionResult ProceedTransaction()
         {
 
-            var cusID = Request["customerId"];
-            var influencerAmount = Convert.ToInt32(Request["amount"]);
+            var advertiserId = Request["customerId"];
+            var totalAmount = Convert.ToInt32(Request["amount"]);    // should be in Cents   eg - $10 means 1000
             var influencerAccId = Request["influencerAccId"];
-            var transactionId = Request["transactionId"];
+            //var transactionId = Request["transactionId"];
 
-            // TODO
-            // get transactionId ,cusID, chargeAmount,influencerAccId instead of textfields
+            int influencerAmount = Convert.ToInt32(Math.Round((0.85 * totalAmount), 2, MidpointRounding.ToEven));  // Round up if there any fraction
+            int stripeFee = Convert.ToInt32(Math.Round((totalAmount * 0.0175 + 30), 2, MidpointRounding.ToEven));  // Stripe Charge for Austraila  1.75% + 30 Cents
+            int platformCharge = totalAmount - influencerAmount - stripeFee;
 
-
-            int chargeAmount = Convert.ToInt32( (1.15 * influencerAmount* 100)*1.029 ) + 30;
-
-
-            StripeCharge charge = CreateCharge(transactionId ,cusID, chargeAmount);
-
-
-            StripeTransfer transfer = CreateTransfer(transactionId ,influencerAccId, influencerAmount);
-            
-            // save transcation
+            StripeCharge charge = CreateTransaction( advertiserId, totalAmount, platformCharge, influencerAccId);
 
             ViewData["ChargeId"] = charge.Id;
             ViewData["ChargeBalanceTranscationId"] = charge.BalanceTransactionId;
 
-            ViewData["TransferId"] = transfer.Id;
-            ViewData["TransferBalanceTranscation"] = transfer.BalanceTransactionId;
-            ViewData["PaymentId"] = transfer.DestinationPaymentId;
-
             return View();
         }
 
-        public StripeCharge CreateCharge(string transactionId ,string cusID,int amount)
+
+
+        public StripeCharge CreateTransaction(string advertiserId , int totalAmount , int platformCharge , string influencerAccId)
         {
             StripeConfiguration.SetApiKey("");
-            
-            // Charge the Customer instead of the card:
+
+            // direct charge from advertiser & deposit in influencer account
+            // https://stripe.com/docs/connect/direct-charges
+            // https://gist.github.com/jaymedavis/d969be13ca6019686a4e72b82e999546
+
+
+            // Charge the Customer instead of the card
             var chargeOptions = new StripeChargeCreateOptions
             {
-                Amount = amount,
+                Amount = totalAmount,
                 Currency = "usd",
-                CustomerId = cusID,
-                TransferGroup = transactionId
+                CustomerId = advertiserId,
+                ApplicationFee = platformCharge
             };
+
+            var requestOptions = new StripeRequestOptions();
+            requestOptions.StripeConnectAccountId = influencerAccId;
+
             var chargeService = new StripeChargeService();
-            StripeCharge charge = chargeService.Create(chargeOptions);
+            StripeCharge charge = chargeService.Create(chargeOptions,requestOptions);
 
             return charge;
         }
 
 
-        public StripeTransfer CreateTransfer(string transactionId ,string accID, int amount)
-        {
-            StripeConfiguration.SetApiKey("");
 
-            var transferOptions = new StripeTransferCreateOptions()
-            {
-                Amount = amount,
-                Currency = "usd",
-                Destination = accID,
-                TransferGroup = transactionId
-            };
 
-            var transferService = new StripeTransferService();
-            StripeTransfer stripeTransfer = transferService.Create(transferOptions);
 
-            return stripeTransfer;
+
+
+
+
+            /*     public ActionResult ProceedTransaction()
+                 {
+
+                     var cusID = Request["customerId"];
+                     var influencerAmount = Convert.ToInt32(Request["amount"]);
+                     var influencerAccId = Request["influencerAccId"];
+                     var transactionId = Request["transactionId"];
+
+                     int chargeAmount = Convert.ToInt32( (1.15 * influencerAmount* 100)*1.029 ) + 30;
+
+
+                     StripeCharge charge = CreateCharge(transactionId ,cusID, chargeAmount);
+
+
+                     StripeTransfer transfer = CreateTransfer(transactionId ,influencerAccId, influencerAmount);
+
+
+                     ViewData["ChargeId"] = charge.Id;
+                     ViewData["ChargeBalanceTranscationId"] = charge.BalanceTransactionId;
+
+                     ViewData["TransferId"] = transfer.Id;
+                     ViewData["TransferBalanceTranscation"] = transfer.BalanceTransactionId;
+                     ViewData["PaymentId"] = transfer.DestinationPaymentId;
+
+                     return View();
+                 }
+
+                 public StripeCharge CreateCharge(string transactionId ,string cusID,int amount)
+                 {
+                     StripeConfiguration.SetApiKey("");
+
+                     // Charge the Customer instead of the card:
+                     var chargeOptions = new StripeChargeCreateOptions
+                     {
+                         Amount = amount,
+                         Currency = "usd",
+                         CustomerId = cusID,
+                         TransferGroup = transactionId
+                     };
+                     var chargeService = new StripeChargeService();
+                     StripeCharge charge = chargeService.Create(chargeOptions);
+
+                     return charge;
+                 }
+
+
+                 public StripeTransfer CreateTransfer(string transactionId ,string accID, int amount)
+                 {
+                     StripeConfiguration.SetApiKey("");
+
+                     var transferOptions = new StripeTransferCreateOptions()
+                     {
+                         Amount = amount,
+                         Currency = "usd",
+                         Destination = accID,
+                         TransferGroup = transactionId
+                     };
+
+                     var transferService = new StripeTransferService();
+                     StripeTransfer stripeTransfer = transferService.Create(transferOptions);
+
+                     return stripeTransfer;
+                 }
+
+             */
+
+
+
+
+
+
         }
-
-    }
 }
