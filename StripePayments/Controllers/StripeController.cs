@@ -27,7 +27,7 @@ namespace StripeTest.Controllers
         {
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-            var CLIENT_ID = "ca_DAOZKs12XGyanvfkqUZsa3uYf1ROmche";
+            var CLIENT_ID = "";
             var API_KEY = "";
             var TOKEN_URI = "https://connect.stripe.com/oauth/token";
             var AUTHORIZE_URI = "https://connect.stripe.com/oauth/authorize";
@@ -48,6 +48,9 @@ namespace StripeTest.Controllers
                 var request_data = wc.UploadValues(TOKEN_URI, "POST", wc.QueryString);
                 var responseString = UnicodeEncoding.UTF8.GetString(request_data);
                 data = responseString;
+
+                // TODO 
+                // user id -> db
 
             }
 
@@ -76,6 +79,9 @@ namespace StripeTest.Controllers
             var token = Request["stripeToken"];
             var email = Request["stripeEmail"];
             StripeCustomer customer = CreateStripeCustomer(email,token);
+            
+            // TODO
+            // customer.Id -> db
 
             ViewData["token"] = token;
             ViewData["customerID"] = customer.Id;
@@ -112,14 +118,19 @@ namespace StripeTest.Controllers
             var influencerAccId = Request["influencerAccId"];
             var transactionId = Request["transactionId"];
 
-            int chargeAmount = Convert.ToInt32( 1.15 * influencerAmount) + 320;
+            // TODO
+            // get transactionId ,cusID, chargeAmount,influencerAccId instead of textfields
+
+
+            int chargeAmount = Convert.ToInt32( (1.15 * influencerAmount* 100)*1.029 ) + 30;
 
 
             StripeCharge charge = CreateCharge(transactionId ,cusID, chargeAmount);
 
 
             StripeTransfer transfer = CreateTransfer(transactionId ,influencerAccId, influencerAmount);
-
+            
+            // save transcation
 
             ViewData["ChargeId"] = charge.Id;
             ViewData["ChargeBalanceTranscationId"] = charge.BalanceTransactionId;
