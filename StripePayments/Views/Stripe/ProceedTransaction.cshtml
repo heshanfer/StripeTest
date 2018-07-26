@@ -1,0 +1,32 @@
+﻿
+@{
+    ViewBag.Title = "ProceedTransaction";
+}
+
+<h2>ProceedTransaction</h2>
+
+@{
+    var chargeId = ViewData["ChargeId"];
+    var cBalanceId = ViewData["ChargeBalanceTranscationId"];
+
+
+    var transferId = ViewData["TransferId"];
+    var tBalanceId = ViewData["TransferBalanceTranscation"];
+    var paymentId = ViewData["PaymentId"];
+
+}
+
+
+Charges
+=======
+Charge Id               :  <p>@chargeId</p>
+
+Charge Balance Id       :  <p>@cBalanceId</p>
+
+Transfer
+========
+Transfer Id             :  <p>@transferId</p>
+
+Transfer Balance Id     :  <p>@tBalanceId</p>
+
+Payment Id              : <p>@paymentId<p>

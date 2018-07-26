@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<link href="~/Scripts/StripeStyles.css" rel="stylesheet" />
+<style>
+    .center {
+        margin: auto;
+        width: 60%;
+        padding: 10px;
+    }
+
+
+    .button {
+        background-color: #0094ff;
+        border: none;
+        color: white;
+        padding: 8px 18px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+</style>
+
+
+<div class="center">
+      <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_DAOZKs12XGyanvfkqUZsa3uYf1ROmche&scope=read_write" class="stripe-connect dark"><span>Connect with Stripe</span></a>
+</div>
+
+
+<br><br><br>
+
+
+
+<div class="center">
+
+    <form action="Stripe/Checkout" method="POST">
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="pk_test_nBsvdQip9KgLhLYb7NVObEgK"
+                data-name="Diamot"
+                data-description="Connect Card"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto">
+        </script>
+    </form>
+</div>
+
+
+<br><br><br>
+
+
+<div class="center">
+    <form action="Stripe/ProceedTransaction" method="POST">
+
+        Transcation ID :<br>
+        <input type="text" name="transactionId">
+        <br>
+
+        Advertiser ID :<br>
+        <input type="text" name="customerId" >
+        <br>
+
+        Influencer ID :<br>
+        <input type="text" name="influencerAccId">
+        <br>
+
+        Amount:<br>
+        <input type="text" name="amount">
+        <br>
+
+        
+
+        <br>
+        <button class="button">Pay</button>
+    </form>
+</div>
+
+
+    <!--
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+
+    <button id="customButton">Purchase</button>
+
+    <script>
+    var handler = StripeCheckout.configure({
+      key: 'pk_test_nBsvdQip9KgLhLYb7NVObEgK',
+      image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+      locale: 'auto',
+      token: function(token) {
+        // You can access the token ID with `token.id`.
+          // Get the token ID to your server-side code for use.
+          console.log(token.id)
+      }
+    });
+
+    document.getElementById('customButton').addEventListener('click', function(e) {
+      // Open Checkout with further options:
+      handler.open({
+        name: 'Demo Site',
+        description: '2 widgets',
+        amount: 2000
+      });
+      e.preventDefault();
+    });
+
+    // Close Checkout on page navigation:
+    window.addEventListener('popstate', function() {
+      handler.close();
+    });
+    </script>
+    -->
+    <!--div class="row">
+        <div class="col-md-4">
+            <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_DAOZKs12XGyanvfkqUZsa3uYf1ROmche&scope=read_write" class="stripe-connect dark"><span>Connect with Stripe</span></a>
+        </div>
+    </div-->
+    <!--form action="Stripe/Checkout" method="POST">
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="pk_test_nBsvdQip9KgLhLYb7NVObEgK"
+                data-amount="999"
+                data-name="Demo Site"
+                data-description="Widget"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto">
+        </script>
+    </form-->
+
+
